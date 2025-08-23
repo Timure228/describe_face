@@ -1,8 +1,12 @@
 import tensorflow as tf
 import keras
 import matplotlib.pyplot as plt
+import numpy as np
 import os
 import shutil
+
+from markdown_it.common.html_re import attribute
+
 from model import X_test, y_test, celeba_csv
 from model_resnet_34 import ResidualUnit
 from PIL import Image
@@ -20,11 +24,12 @@ model = keras.models.load_model("models/model_cnn.keras")
 #                                            crop_to_aspect_ratio=True)(img_tensor)
 
 
-def predict_img(model: keras.models.Model, image, plot_img=False):
+def predict_img(model: keras.models.Model, image, plot_img=False, as_int=False):
     # Make a prediction
     y_pred = model.predict(tf.expand_dims(image, 0))
     # Turn into percents
-    percents = [f"{i:.3}%" for i in y_pred[0] * 100]
+    if not as_int:
+        y_pred = [f"{i:.3}%" for i in y_pred[0] * 100]
     # List of the attributes
     attr_list = list(celeba_csv)[1:]
 
@@ -33,22 +38,36 @@ def predict_img(model: keras.models.Model, image, plot_img=False):
         plt.imshow(image)
         plt.show()
 
-    return dict(zip(attr_list, percents))
+    return dict(zip(attr_list, y_pred[0]))
 
 
 def describe(model: keras.models.Model, image):
-    predictions = predict_img(model, image)
-    hair_attr = ["Bald", "Black_Hair", "Blond_Hair", "Brown_Hair"]
-    hair_type = "Unknown"
+    predictions = predict_img(model, image, as_int=True)
 
-    # Choose the hair with the highest probability
+    # Hair
+    hair_attr = ["Bald", "Black_Hair", "Blond_Hair", "Brown_Hair"]
+    # Choose the hair type with the highest probability
     prev_hair = "Bald"
     for hair in hair_attr:
         if predictions[hair] > predictions[prev_hair]:
-            hair_type = hair
+            hair_type = f"{hair} ({100*predictions[hair]:.1f}%)"
         prev_hair = hair
 
-    return hair_type
+    # Attractive (ugly, average, pretty, beautiful)
+    if predictions["Attractive"] <= np.float32(0.25):
+        attractiveness = "Ugly"
+    elif predictions["Attractive"] <= np.float32(0.6):
+        attractiveness = "Average"
+    elif predictions["Attractive"] <= np.float32(0.8):
+        attractiveness = "Pretty"
+    else:
+        attractiveness = "Beautiful"
+
+    plt.imshow(image)
+    plt.axis(False)
+    plt.title(f"Hair: {hair_type} \n"
+              f"Attractiveness: {attractiveness} ({100*predictions["Attractive"]:.1f}%)")
+    plt.show()
 
 
 def save_by_attribute(model: keras.models.Model,
@@ -95,6 +114,7 @@ def printout_prf(model, labels, samples):
             f"Precision: {100 * precision_score :.1f}% \n"
             f"F1-Score: {100 * f1_score :.1f}%")
 
+
 # print(predict_img(mobilenet, X_test[343], True))
 
 # Regular model
@@ -122,4 +142,4 @@ def printout_prf(model, labels, samples):
 #                   images_path="images/test_images",
 #                   save_path="images/blond_people")
 
-print(predict_img(model, X_test[23]))
+print(describe(model, X_test[100]))
