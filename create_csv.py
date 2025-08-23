@@ -14,4 +14,4 @@ with open("data/list_attr_celeba.txt", "r") as f:
 image_attributes = [['0' if s == '-1' else s for s in x] for x in image_attributes]
 print(image_attributes)
 dataframe = pd.DataFrame(data=image_attributes, columns=attributes)
-dataframe.to_csv("C:/Users/tymur.arduch/PycharmProjects/describe_face/data/celeba.csv", index_label="ID")
+dataframe.to_csv("data/celeba.csv", index_label="ID")
