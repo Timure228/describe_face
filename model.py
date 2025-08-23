@@ -4,14 +4,14 @@ import pandas as pd
 import keras
 
 # CSV (labels)
-celeba_csv = pd.read_csv("/data/celeba.csv")
+celeba_csv = pd.read_csv("data/celeba.csv")
 
 csv_no_id = celeba_csv.drop("ID", axis=1)
 
 csv_copy = csv_no_id.copy()
 
 # NPY (photo tensors)
-celeba_photos = np.load("/data/photos_tensor.npy")
+celeba_photos = np.load("data/photos_tensor.npy")
 
 celeba_tensors = tf.convert_to_tensor(celeba_photos)
 
@@ -64,4 +64,4 @@ if __name__ == "__main__":
     # Show the model architecture
     model_cnn.summary()
     # Save the model
-    model_cnn.save('C:/Users/tymur.arduch/PycharmProjects/describe_face/models/model_cnn.keras')
+    model_cnn.save('models/model_cnn.keras')

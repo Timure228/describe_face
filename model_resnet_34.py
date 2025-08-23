@@ -77,4 +77,4 @@ if __name__ == "__main__":
                    epochs=1, callbacks=[early_stop])
 
     # Save the model
-    res_net_34.save('C:/Users/tymur.arduch/PycharmProjects/describe_face/models/res_net_34.keras')
+    res_net_34.save('models/res_net_34.keras')

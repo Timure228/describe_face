@@ -14,10 +14,10 @@ model = keras.models.load_model("models/model_cnn.keras")
 # mobilenet = keras.models.load_model("models/MobileNetV3_Small.keras")
 
 # Preprocess the image
-img = Image.open("me2.jpg")
-img_tensor = tf.convert_to_tensor(img) / 255
-img_tensor_resized = keras.layers.Resizing(height=128, width=128,
-                                           crop_to_aspect_ratio=True)(img_tensor)
+# img = Image.open("me2.jpg")
+# img_tensor = tf.convert_to_tensor(img) / 255
+# img_tensor_resized = keras.layers.Resizing(height=128, width=128,
+#                                            crop_to_aspect_ratio=True)(img_tensor)
 
 
 def predict_img(model: keras.models.Model, image, plot_img=False):
@@ -122,4 +122,4 @@ def printout_prf(model, labels, samples):
 #                   images_path="images/test_images",
 #                   save_path="images/blond_people")
 
-print(describe(model, X_test[23]))
+print(predict_img(model, X_test[23]))

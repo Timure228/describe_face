@@ -38,4 +38,4 @@ if __name__ == "__main__":
                             epochs=10)
 
     # Save the model
-    transfer_mobile_net.save('C:/Users/tymur.arduch/PycharmProjects/describe_face/models/MobileNetV3_Small.keras')
+    transfer_mobile_net.save('models/MobileNetV3_Small.keras')
