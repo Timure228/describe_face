@@ -18,27 +18,27 @@ model = keras.models.load_model("models/model_cnn.keras")
 # mobilenet = keras.models.load_model("models/MobileNetV3_Small.keras")
 
 # Preprocess the image
-# img = Image.open("me2.jpg")
-# img_tensor = tf.convert_to_tensor(img) / 255
-# img_tensor_resized = keras.layers.Resizing(height=128, width=128,
-#                                            crop_to_aspect_ratio=True)(img_tensor)
+img = Image.open("me.jpg")
+img_tensor = tf.convert_to_tensor(img) / 255
+img_tensor_resized = keras.layers.Resizing(height=128, width=128,
+                                           crop_to_aspect_ratio=True)(img_tensor)
 
 
 def predict_img(model: keras.models.Model, image, plot_img=False, as_int=False):
     # Make a prediction
     y_pred = model.predict(tf.expand_dims(image, 0))
-    # Turn into percents
-    if not as_int:
-        y_pred = [f"{i:.3}%" for i in y_pred[0] * 100]
     # List of the attributes
     attr_list = list(celeba_csv)[1:]
-
+    # Turn into percents
+    if as_int:
+        return dict(zip(attr_list, y_pred[0]))
+    percents = [f"{i:.3}%" for i in y_pred[0] * 100]
     # Plot the image
     if plot_img:
         plt.imshow(image)
         plt.show()
 
-    return dict(zip(attr_list, y_pred[0]))
+    return dict(zip(attr_list, percents))
 
 
 def describe(model: keras.models.Model, image):
@@ -142,4 +142,5 @@ def printout_prf(model, labels, samples):
 #                   images_path="images/test_images",
 #                   save_path="images/blond_people")
 
-print(describe(model, X_test[100]))
+print(predict_img(model, img_tensor_resized))
+print(describe(model, img_tensor_resized))
