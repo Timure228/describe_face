@@ -15,13 +15,6 @@ model = keras.models.load_model("models/model_cnn.keras")
 # res_net_34 = keras.models.load_model("models/res_net_34.keras")
 # mobilenet = keras.models.load_model("models/MobileNetV3_Small.keras")
 
-# Preprocess the image
-img = Image.open("example.jpg")
-img_tensor = tf.convert_to_tensor(img) / 255
-img_tensor_resized = keras.layers.Resizing(height=128, width=128,
-                                           crop_to_aspect_ratio=True)(img_tensor)
-
-
 def predict_img(model: keras.models.Model, image=None, image_path=None, plot_img=False, as_int=False, custom=False):
     if image and image_path is None:
         return "No image provided"
