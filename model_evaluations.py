@@ -5,8 +5,6 @@ import numpy as np
 import os
 import shutil
 
-from markdown_it.common.html_re import attribute
-
 from model import X_test, y_test, celeba_csv
 from model_resnet_34 import ResidualUnit
 from PIL import Image
@@ -18,15 +16,23 @@ model = keras.models.load_model("models/model_cnn.keras")
 # mobilenet = keras.models.load_model("models/MobileNetV3_Small.keras")
 
 # Preprocess the image
-img = Image.open("me.jpg")
+img = Image.open("example.jpg")
 img_tensor = tf.convert_to_tensor(img) / 255
 img_tensor_resized = keras.layers.Resizing(height=128, width=128,
                                            crop_to_aspect_ratio=True)(img_tensor)
 
 
-def predict_img(model: keras.models.Model, image, plot_img=False, as_int=False):
+def predict_img(model: keras.models.Model, image=None, image_path=None, plot_img=False, as_int=False, custom=False):
+    if image and image_path is None:
+        return "No image provided"
+    # Custom image preprocessing
+    if custom and image_path is not None:
+        image = Image.open(image_path)
+        image_tensor = tf.convert_to_tensor(img) / 255
+        image_tensor_resized = keras.layers.Resizing(height=128, width=128,
+                                                     crop_to_aspect_ratio=True)(image_tensor)
     # Make a prediction
-    y_pred = model.predict(tf.expand_dims(image, 0))
+    y_pred = model.predict(tf.expand_dims(image_tensor_resized, 0))
     # List of the attributes
     attr_list = list(celeba_csv)[1:]
     # Turn into percents
@@ -41,7 +47,8 @@ def predict_img(model: keras.models.Model, image, plot_img=False, as_int=False):
     return dict(zip(attr_list, percents))
 
 
-def describe(model: keras.models.Model, image):
+def describe(model: keras.models.Model, image) -> None:
+    # Get the predictions
     predictions = predict_img(model, image, as_int=True)
 
     # Hair
@@ -50,10 +57,10 @@ def describe(model: keras.models.Model, image):
     prev_hair = "Bald"
     for hair in hair_attr:
         if predictions[hair] > predictions[prev_hair]:
-            hair_type = f"{hair} ({100*predictions[hair]:.1f}%)"
+            hair_type = f"{hair} ({100 * predictions[hair]:.1f}%)"
         prev_hair = hair
 
-    # Attractive (ugly, average, pretty, beautiful)
+    # Attractiveness (ugly, average, pretty, beautiful)
     if predictions["Attractive"] <= np.float32(0.25):
         attractiveness = "Ugly"
     elif predictions["Attractive"] <= np.float32(0.6):
@@ -63,10 +70,11 @@ def describe(model: keras.models.Model, image):
     else:
         attractiveness = "Beautiful"
 
+    # Plot the image
     plt.imshow(image)
     plt.axis(False)
     plt.title(f"Hair: {hair_type} \n"
-              f"Attractiveness: {attractiveness} ({100*predictions["Attractive"]:.1f}%)")
+              f"Attractiveness: {attractiveness} ({100 * predictions["Attractive"]:.1f}%)")
     plt.show()
 
 
@@ -94,6 +102,7 @@ def save_by_attribute(model: keras.models.Model,
 
 
 def printout_prf(model, labels, samples):
+    # Get the predictions
     y_test_pred = model.predict(samples)
 
     # Define the Recall
@@ -142,5 +151,5 @@ def printout_prf(model, labels, samples):
 #                   images_path="images/test_images",
 #                   save_path="images/blond_people")
 
-print(predict_img(model, img_tensor_resized))
-print(describe(model, img_tensor_resized))
+print(predict_img(model, custom=True, image_path="example.jpg", plot_img=True))
+# print(describe(model, img_tensor_resized))
