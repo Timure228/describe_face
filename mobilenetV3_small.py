@@ -10,8 +10,8 @@ if __name__ == "__main__":
     input_ = keras.layers.Input((128, 128, 3))
     x = keras.applications.mobilenet_v3.preprocess_input(input_)
     x = mobile_net(x)
-    x = keras.layers.Dropout(0.5)(x)
     x = keras.layers.GlobalAvgPool2D()(x)  # include GlobalAvgPool2D
+    x = keras.layers.Dropout(0.5)(x)
     output_ = keras.layers.Dense(40, activation="sigmoid")(x)
     transfer_mobile_net = keras.Model(input_, output_)
     # 1.
