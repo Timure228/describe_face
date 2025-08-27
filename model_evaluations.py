@@ -12,20 +12,20 @@ import glob
 
 # Load the model
 model = keras.models.load_model("models/model_cnn.keras")
+
+
 # res_net_34 = keras.models.load_model("models/res_net_34.keras")
 # mobilenet = keras.models.load_model("models/MobileNetV3_Small.keras")
+def preprocess_img(image_path):
+    image = Image.open(image_path)
+    image_tensor = tf.convert_to_tensor(img) / 255
+    image_tensor_resized = keras.layers.Resizing(height=128, width=128,
+                                                 crop_to_aspect_ratio=True)(image_tensor)
+    return image_tensor_resized
 
-def predict_img(model: keras.models.Model, image=None, image_path=None, plot_img=False, as_int=False, custom=False):
-    if image and image_path is None:
-        return "No image provided"
-    # Custom image preprocessing
-    if custom and image_path is not None:
-        image = Image.open(image_path)
-        image_tensor = tf.convert_to_tensor(img) / 255
-        image_tensor_resized = keras.layers.Resizing(height=128, width=128,
-                                                     crop_to_aspect_ratio=True)(image_tensor)
+def predict_img(model: keras.models.Model, image, plot_img=False, as_int=False):
     # Make a prediction
-    y_pred = model.predict(tf.expand_dims(image_tensor_resized, 0))
+    y_pred = model.predict(tf.expand_dims(image, 0))
     # List of the attributes
     attr_list = list(celeba_csv)[1:]
     # Turn into percents
