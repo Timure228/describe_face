@@ -18,7 +18,7 @@ model = keras.models.load_model("models/model_cnn.keras")
 # mobilenet = keras.models.load_model("models/MobileNetV3_Small.keras")
 def preprocess_img(image_path):
     image = Image.open(image_path)
-    image_tensor = tf.convert_to_tensor(img) / 255
+    image_tensor = tf.convert_to_tensor(image) / 255
     image_tensor_resized = keras.layers.Resizing(height=128, width=128,
                                                  crop_to_aspect_ratio=True)(image_tensor)
     return image_tensor_resized
@@ -63,11 +63,15 @@ def describe(model: keras.models.Model, image) -> None:
     else:
         attractiveness = "Beautiful"
 
+    # Smiling
+    smiling = "Yes" if predictions["Smiling"] > np.float32(0.65) else "No"
+
     # Plot the image
     plt.imshow(image)
     plt.axis(False)
     plt.title(f"Hair: {hair_type} \n"
-              f"Attractiveness: {attractiveness} ({100 * predictions["Attractive"]:.1f}%)")
+              f"Attractiveness: {attractiveness} ({100 * predictions["Attractive"]:.1f}%) \n"
+              f"Smiling: {smiling}")
     plt.show()
 
 
@@ -144,5 +148,5 @@ def printout_prf(model, labels, samples):
 #                   images_path="images/test_images",
 #                   save_path="images/blond_people")
 
-print(predict_img(model, custom=True, image_path="example.jpg", plot_img=True))
-# print(describe(model, img_tensor_resized))
+# print(predict_img(model, X_test[3]))
+print(describe(model, X_test[4]))
