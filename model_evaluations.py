@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 import shutil
+import cv2
 
 from model import X_test, y_test, celeba_csv
 from model_resnet_34 import ResidualUnit
@@ -23,7 +24,11 @@ def preprocess_img(image_path):
                                                  crop_to_aspect_ratio=True)(image_tensor)
     return image_tensor_resized
 
-def predict_img(model: keras.models.Model, image, plot_img=False, as_int=False):
+
+def predict_img(model: keras.models.Model,
+                image,
+                plot_img=False,
+                as_int=False):
     # Make a prediction
     y_pred = model.predict(tf.expand_dims(image, 0))
     # List of the attributes
@@ -66,13 +71,28 @@ def describe(model: keras.models.Model, image) -> None:
     # Smiling
     smiling = "Yes" if predictions["Smiling"] > np.float32(0.65) else "No"
 
-    # Plot the image
-    plt.imshow(image)
-    plt.axis(False)
-    plt.title(f"Hair: {hair_type} \n"
-              f"Attractiveness: {attractiveness} ({100 * predictions["Attractive"]:.1f}%) \n"
-              f"Smiling: {smiling}")
-    plt.show()
+    # Plot the image with cv2
+    # Create panel
+    panel_width = 400
+    h, w = 512, 512
+    panel = np.ones((h, panel_width, 3), dtype=np.uint8) * 255
+    # Add text
+    cv2.putText(panel, f"Hair: {hair_type}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2)
+    cv2.putText(panel, f"Attractiveness: {attractiveness}", (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2)
+    cv2.putText(panel, f"Big Lips: {100 * predictions["Big_Lips"]:.1f}%", (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.8,
+                (0, 0, 0), 2)
+    cv2.putText(panel, f"Big Nose: {100 * predictions["Big_Nose"]:.1f}%", (10, 120), cv2.FONT_HERSHEY_SIMPLEX, 0.8,
+                (0, 0, 0), 2)
+    cv2.putText(panel, f"Sex: {"Male" if predictions["Male"] > np.float32(0.5) else "Female"}", (10, 150),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2)
+    # Concatenate image and panel
+    r_img = keras.layers.Resizing(height=512, width=512,
+                                  crop_to_aspect_ratio=True)(image).numpy()
+    img = cv2.cvtColor(r_img, cv2.COLOR_RGB2BGR)
+    ui_img = np.hstack((img, panel))
+    cv2.imshow('UI', ui_img)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
 
 def save_by_attribute(model: keras.models.Model,
@@ -125,10 +145,10 @@ def printout_prf(model, labels, samples):
 
 # Regular model
 # print(printout_prf(model=model, labels=y_test, samples=X_test))
-# epochs=200, momentum=0.1, learning_rate=0.001, model=model
-# Recall: 55.6%
-# Precision 79.3%
-# F1-Score 65.4%
+# epochs=250 (Actually did ~120), momentum=0.7, learning_rate=0.001, model=model
+# Recall: 57.8%
+# Precision 81.5%
+# F1-Score 67.6%
 
 # ResNet-34
 # print(printout_prf(model=res_net_34, labels=y_test, samples=X_test))
@@ -149,4 +169,5 @@ def printout_prf(model, labels, samples):
 #                   save_path="images/blond_people")
 
 # print(predict_img(model, X_test[3]))
-print(describe(model, X_test[4]))
+print(describe(model, preprocess_img("images.jpg")))
+# print(describe(model, X_test[494]))

@@ -47,20 +47,20 @@ model_cnn = keras.Sequential([
 ])
 
 # Define optimizer and loss function
-optimizer = keras.optimizers.SGD(momentum=0.1, learning_rate=0.001)
+optimizer = keras.optimizers.SGD(momentum=0.7, learning_rate=0.001)
 loss = keras.losses.BinaryCrossentropy()
 
 # Train
 if __name__ == "__main__":
     # Compile the model
     model_cnn.compile(optimizer=optimizer, loss=loss,
-                      metrics=["accuracy"])
+                      metrics=["precision", "recall"])
 
     # Define the callbacks
     early_stop = keras.callbacks.EarlyStopping(patience=7, restore_best_weights=True)
     # Train the model
     history = model_cnn.fit(X_train, y_train, validation_data=(X_val, y_val), batch_size=32,
-                            epochs=200, callbacks=[early_stop])
+                            epochs=250, callbacks=[early_stop])
     # Show the model architecture
     model_cnn.summary()
     # Save the model
