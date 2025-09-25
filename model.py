@@ -3,10 +3,12 @@ import numpy as np
 import pandas as pd
 import keras
 
-# CSV (labels)
-celeba_csv = pd.read_csv("data/celeba.csv")
+# CSV (labels)celeba_csv = pd.read_csv("data/celeba.csv")
+celeba_csv = pd.read_csv("data/celeba_edited.csv")
 
 csv_no_id = celeba_csv.drop("ID", axis=1)
+
+n_outputs = len(csv_no_id.columns)
 
 csv_copy = csv_no_id.copy()
 
@@ -43,7 +45,7 @@ model_cnn = keras.Sequential([
     keras.layers.Dense(300, activation=leaky_relu, kernel_initializer="he_normal"),
     keras.layers.Dropout(0.5),
     keras.layers.BatchNormalization(),
-    keras.layers.Dense(40, activation=keras.activations.sigmoid)
+    keras.layers.Dense(n_outputs, activation=keras.activations.sigmoid)
 ])
 
 # Define optimizer and loss function
@@ -64,4 +66,4 @@ if __name__ == "__main__":
     # Show the model architecture
     model_cnn.summary()
     # Save the model
-    model_cnn.save('models/model_cnn.keras')
+    model_cnn.save('models/model_cnn_on_edited.keras')
