@@ -13,7 +13,7 @@ n_outputs = len(csv_no_id.columns)
 csv_copy = csv_no_id.copy()
 
 # NPY (photo tensors)
-celeba_photos = np.load("data/photos_tensor.npy")
+celeba_photos = np.load("data/photos_tensor.npy")["images"]
 
 celeba_tensors = tf.convert_to_tensor(celeba_photos)
 
@@ -32,7 +32,7 @@ import tensorflow as tf
 leaky_relu = tf.nn.leaky_relu
 # Define the model architecture
 model_cnn = keras.Sequential([
-    keras.layers.Input((128, 128, 3)),
+    keras.layers.Input((178, 218, 3)),
     keras.layers.Conv2D(filters=32, kernel_size=11, strides=4, activation=leaky_relu),
     keras.layers.MaxPooling2D(strides=2),
     keras.layers.Conv2D(filters=64, kernel_size=5, strides=1, padding="same", activation=leaky_relu),
@@ -59,10 +59,10 @@ if __name__ == "__main__":
                       metrics=["precision", "recall"])
 
     # Define the callbacks
-    early_stop = keras.callbacks.EarlyStopping(patience=7, restore_best_weights=True)
+    # early_stop = keras.callbacks.EarlyStopping(patience=15, restore_best_weights=True)
     # Train the model
     history = model_cnn.fit(X_train, y_train, validation_data=(X_val, y_val), batch_size=32,
-                            epochs=250, callbacks=[early_stop])
+                            epochs=150)
     # Show the model architecture
     model_cnn.summary()
     # Save the model

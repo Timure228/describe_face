@@ -1,10 +1,9 @@
-import tensorflow as tf
 import keras
 from model import X_train, y_train, X_val, y_val, loss, optimizer
 from functools import partial
 
 # Create the ResidualUnit class
-DefaultConv2D = partial(tf.keras.layers.Conv2D, kernel_size=3, strides=1,
+DefaultConv2D = partial(keras.layers.Conv2D, kernel_size=3, strides=1,
                         padding="same", kernel_initializer="he_normal",
                         use_bias=False)
 
@@ -47,7 +46,7 @@ class ResidualUnit(keras.layers.Layer):
 if __name__ == "__main__":
     # Define the ResNet-34 model
     res_net_34 = keras.Sequential([
-        keras.layers.Input((128, 128, 3)),
+        keras.layers.Input((178, 218, 3)),
         DefaultConv2D(64, kernel_size=7, strides=2),
         keras.layers.BatchNormalization(),
         keras.layers.Activation("relu"),
@@ -61,7 +60,7 @@ if __name__ == "__main__":
 
     res_net_34.add(keras.layers.GlobalAvgPool2D())
     res_net_34.add(keras.layers.Flatten())
-    res_net_34.add(keras.layers.Dense(40, activation=tf.keras.activations.sigmoid))
+    res_net_34.add(keras.layers.Dense(40, activation=keras.activations.sigmoid))
 
     # Compile the model
     res_net_34.compile(optimizer=optimizer, loss=loss, metrics=["accuracy"])
