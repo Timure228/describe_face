@@ -12,14 +12,15 @@ from PIL import Image
 import glob
 
 # Load the model
-model = keras.models.load_model("models/model_cnn_on_edited.keras")
+model = keras.models.load_model("models/model_cnn.keras")
+model_10 = keras.models.load_model("models/model_cnn_on_edited.keras")
 
 # res_net_34 = keras.models.load_model("models/res_net_34.keras")
 # mobilenet = keras.models.load_model("models/MobileNetV3_Small.keras")
 def preprocess_img(image_path):
     image = Image.open(image_path)
     image_tensor = tf.convert_to_tensor(image) / 255
-    image_tensor_resized = keras.layers.Resizing(height=128, width=128,
+    image_tensor_resized = keras.layers.Resizing(height=178, width=218,
                                                  crop_to_aspect_ratio=True)(image_tensor)
     return image_tensor_resized
 
@@ -140,7 +141,7 @@ def printout_prf(model, labels, samples):
             f"F1-Score: {100 * f1_score :.1f}%")
 
 
-# print(predict_img(mobilenet, X_test[343], True))
+print(predict_img(model_10, preprocess_img("C:/Users/tymur.arduch/Downloads/m-brauer-W49xnqoy6oc-unsplash.jpg"), plot_img=True))
 
 # Regular model
 # print(printout_prf(model=model, labels=y_test, samples=X_test))
@@ -150,11 +151,11 @@ def printout_prf(model, labels, samples):
 # F1-Score 67.6%
 
 # Regular model (10 Attributes)
-print(printout_prf(model=model, labels=y_test, samples=X_test))
-# epochs=250 (Actually did 56), momentum=0.7, learning_rate=0.001, model=model
-# Recall: 68.1%
-# Precision: 79.1%
-# F1-Score: 73.2%
+# print(printout_prf(model=model_10, labels=y_test, samples=X_test))
+# epochs=150, momentum=0.7, learning_rate=0.001, model=model_10
+# Recall: 74.4%
+# Precision: 78.5%
+# F1-Score: 76.4%
 
 # ResNet-34
 # print(printout_prf(model=res_net_34, labels=y_test, samples=X_test))

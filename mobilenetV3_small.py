@@ -7,7 +7,7 @@ if __name__ == "__main__":
     mobile_net = keras.applications.MobileNetV3Small(weights="imagenet",
                                                      include_top=False)
     # Customize the model
-    input_ = keras.layers.Input((128, 128, 3))
+    input_ = keras.layers.Input((178, 218, 3))
     x = keras.applications.mobilenet_v3.preprocess_input(input_)
     x = mobile_net(x)
     x = keras.layers.GlobalAvgPool2D()(x)  # include GlobalAvgPool2D

@@ -3,7 +3,7 @@ from PIL import Image
 import os
 
 
-image_size = (128, 128)
+image_size = (178, 218)
 images_path = "images/img_align_celeba"
 
 image_tensors = []
@@ -13,4 +13,4 @@ for image_name in os.listdir(images_path):
     image_array = np.array(image) / 255.0
     image_tensors.append(image_array)
 
-np.save("/data/photos_tensor.npy", np.array(image_tensors, dtype=np.float32))
+np.savez_compressed("/data/photos_tensor.npy", images=np.array(image_tensors, dtype=np.float32))
